@@ -126,7 +126,7 @@ export class ApiServicePostgreSQL {
       });
       return result.data.Asignee;
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR getAsignees:', err);
     }
   };
 
@@ -140,7 +140,7 @@ export class ApiServicePostgreSQL {
       });
       return result.data.Sprint_by_pk;
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR getSprintByPk:', err);
     }
   };
 
@@ -154,7 +154,7 @@ export class ApiServicePostgreSQL {
       });
       return result.data.Task_by_pk;
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR getTaskByPk:', err);
     }
   };
 
@@ -169,7 +169,8 @@ export class ApiServicePostgreSQL {
       });
       return result.data.AsigneeTasks;
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log(asigneeName, taskId);
+      console.log('ERROR getAsigneeTasks:', err);
     }
   };
 
@@ -182,7 +183,8 @@ export class ApiServicePostgreSQL {
         },
       });
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log(objects);
+      console.log('ERROR createAsigneesTasks:', err);
     }
   };
 
@@ -195,7 +197,7 @@ export class ApiServicePostgreSQL {
         },
       });
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR createAsignees:', err);
     }
   };
 
@@ -208,7 +210,7 @@ export class ApiServicePostgreSQL {
         },
       });
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR createTasks:', err);
     }
   };
 
@@ -221,7 +223,7 @@ export class ApiServicePostgreSQL {
         },
       });
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR createSprints:', err);
     }
   };
 

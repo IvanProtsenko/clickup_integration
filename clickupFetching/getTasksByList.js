@@ -38,7 +38,6 @@ async function createMembers(listId) {
 
 export default async function getTasks(listId, sprintName, page) {
   const url = `${clickupUrl}list/${listId}/task?page=${page}&archived=false&subtasks=true&include_closed=true`;
-
   const params = { url, method: 'GET' };
 
   try {

@@ -8,14 +8,14 @@ async function createAsigneeTasks(res) {
     const asignees = await res.assignees.map((asignee) => asignee.username);
     for (let i = 0; i < asignees.length; i++) {
       let existingConnection = await apiServicePostgres.getAsigneeTasks(
-        asignees[i],
-        res.id
+        asignees[i].toString(),
+        res.id.toString()
       );
 
       if (existingConnection.length == 0)
         await apiServicePostgres.createAsigneesTasks({
-          asignee_name: asignees[i],
-          task_id: res.id,
+          asignee_name: asignees[i].toString(),
+          task_id: res.id.toString(),
         });
     }
   } catch (err) {
@@ -65,7 +65,7 @@ export default async function getTaskById(taskId) {
       status: res.status ? res.status.status : null,
       priority: res.priority ? res.priority.priority : null,
       task_type: customFields.task_type,
-      time_spent: res.time_spent || null,
+      time_spent: res.time_spent.toString() || null,
       satisfaction: customFields.satisfaction,
       sprint_points: res.points || null,
       project_name: customFields.project_name,
