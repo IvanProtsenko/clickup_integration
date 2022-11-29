@@ -1,10 +1,16 @@
+import dotenv from 'dotenv';
+
 import getTaskById from './getTaskById.js';
 import fetchClickupObject from './fetchClickupObject.js';
-import apiServicePostgres from '../services/ApiService.js';
+import { ApiServicePostgreSQL } from '../services/ApiService.js';
+import makeApolloClient from '../services/makeApolloClient.js';
 
+dotenv.config();
 const clickupUrl = 'https://api.clickup.com/api/v2/';
 
 async function createSprint(listId, sprintName) {
+  const apolloClient = makeApolloClient(process.env.HASURA_URL);
+  const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
   try {
     const sprint = await apiServicePostgres.getSprintByPk(listId);
     if (!sprint)
@@ -15,6 +21,8 @@ async function createSprint(listId, sprintName) {
 }
 
 async function createMembers(listId) {
+  const apolloClient = makeApolloClient(process.env.HASURA_URL);
+  const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
   try {
     const membersUrl = `${clickupUrl}list/${listId}/member`;
     const membersParams = { url: membersUrl, method: 'GET' };
@@ -41,8 +49,10 @@ export default async function getTasks(listId, sprintName, page) {
   const params = { url, method: 'GET' };
 
   try {
-    await createSprint(listId, sprintName);
-    await createMembers(listId);
+    if (page == 0) {
+      await createSprint(listId, sprintName);
+      await createMembers(listId);
+    }
 
     const res = await fetchClickupObject(params);
     console.log(sprintName + ': ' + res.tasks.length);

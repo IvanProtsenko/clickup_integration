@@ -1,13 +1,16 @@
 import pkg from '@apollo/client/core/core.cjs';
 const { ApolloClient, InMemoryCache, HttpLink } = pkg;
 import fetch from 'cross-fetch';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 function getHttpLink(httpURL) {
   return new HttpLink({
     uri: httpURL,
     fetch,
     headers: {
-      'x-hasura-admin-secret': `nAkV99ENc4yWM9QQSLz1852wSZW0Uw6OdeiS8QGlsF8=`,
+      'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
     },
   });
 }

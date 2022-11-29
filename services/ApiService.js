@@ -49,6 +49,14 @@ export class ApiServicePostgreSQL {
     }
   `;
 
+  GET_ASIGNEE_BY_PK = gql`
+    query GetAsigneeByPk($name: String!) {
+      Asignee_by_pk(name: $name) {
+        name
+      }
+    }
+  `;
+
   CREATE_TASK = gql`
     mutation createTasks($objects: [Task_insert_input!]!) {
       insert_Task(objects: $objects) {
@@ -174,9 +182,24 @@ export class ApiServicePostgreSQL {
     }
   };
 
+  getAsigneeByPk = async (name) => {
+    try {
+      const result = await this.client.query({
+        query: this.GET_ASIGNEE_BY_PK,
+        variables: {
+          name,
+        },
+      });
+      return result.data.Asignee_by_pk;
+    } catch (err) {
+      console.log(name);
+      console.log('ERROR getAsigneeByPk:', err);
+    }
+  };
+
   createAsigneesTasks = async (objects) => {
     try {
-      const result = await this.client.mutate({
+      await this.client.mutate({
         mutation: this.CREATE_ASIGNEES_TASKS,
         variables: {
           objects,
@@ -190,7 +213,7 @@ export class ApiServicePostgreSQL {
 
   createAsignees = async (objects) => {
     try {
-      const result = await this.client.mutate({
+      await this.client.mutate({
         mutation: this.CREATE_ASIGNEES,
         variables: {
           objects,
@@ -203,7 +226,7 @@ export class ApiServicePostgreSQL {
 
   createTasks = async (objects) => {
     try {
-      const result = await this.client.mutate({
+      await this.client.mutate({
         mutation: this.CREATE_TASK,
         variables: {
           objects,
@@ -216,7 +239,7 @@ export class ApiServicePostgreSQL {
 
   createSprints = async (objects) => {
     try {
-      const result = await this.client.mutate({
+      await this.client.mutate({
         mutation: this.CREATE_SPRINTS,
         variables: {
           objects,
@@ -229,45 +252,45 @@ export class ApiServicePostgreSQL {
 
   deleteAsigneesTasks = async () => {
     try {
-      const result = await this.client.mutate({
+      await this.client.mutate({
         mutation: this.DELETE_ASIGNEES_TASKS,
       });
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR deleteAsigneesTasks:', err);
     }
   };
 
   deleteAsignees = async () => {
     try {
-      const result = await this.client.mutate({
+      await this.client.mutate({
         mutation: this.DELETE_ASIGNEES,
       });
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR deleteAsignees:', err);
     }
   };
 
   deleteTasks = async () => {
     try {
-      const result = await this.client.mutate({
+      await this.client.mutate({
         mutation: this.DELETE_TASKS,
       });
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR deleteTasks:', err);
     }
   };
 
   deleteSprints = async () => {
     try {
-      const result = await this.client.mutate({
+      await this.client.mutate({
         mutation: this.DELETE_SPRINTS,
       });
     } catch (err) {
-      console.log('ERROR:', err);
+      console.log('ERROR deleteSprints:', err);
     }
   };
 }
 
 const apolloClient = makeApolloClient(process.env.HASURA_URL);
 const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
-export default apiServicePostgres;
+export default { apiServicePostgres, ApiServicePostgreSQL };

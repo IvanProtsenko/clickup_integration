@@ -1,9 +1,15 @@
-import apiServicePostgres from '../services/ApiService.js';
-import fetchClickupObject from './fetchClickupObject.js';
+import dotenv from 'dotenv';
 
+import fetchClickupObject from './fetchClickupObject.js';
+import { ApiServicePostgreSQL } from '../services/ApiService.js';
+import makeApolloClient from '../services/makeApolloClient.js';
+
+dotenv.config();
 const clickupUrl = 'https://api.clickup.com/api/v2/';
 
 async function createAsigneeTasks(res) {
+  const apolloClient = makeApolloClient(process.env.HASURA_URL);
+  const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
   try {
     const asignees = await res.assignees.map((asignee) => asignee.username);
     for (let i = 0; i < asignees.length; i++) {
@@ -11,6 +17,13 @@ async function createAsigneeTasks(res) {
         asignees[i].toString(),
         res.id.toString()
       );
+
+      const existingAsignee = await apiServicePostgres.getAsigneeByPk(
+        asignees[i]
+      );
+
+      if (!existingAsignee)
+        await apiServicePostgres.createAsignees({ name: asignees[i] });
 
       if (existingConnection.length == 0)
         await apiServicePostgres.createAsigneesTasks({
@@ -52,6 +65,8 @@ function calculateCustomFields(customFields) {
 }
 
 export default async function getTaskById(taskId) {
+  const apolloClient = makeApolloClient(process.env.HASURA_URL);
+  const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
   const url = `${clickupUrl}task/${taskId}?custom_task_ids=true&include_subtasks=true`;
   const params = { url, method: 'GET' };
   try {
