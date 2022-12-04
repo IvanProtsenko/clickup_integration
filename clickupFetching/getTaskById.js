@@ -72,6 +72,7 @@ export default async function getTaskById(taskId) {
   try {
     const res = await fetchClickupObject(params);
     const customFields = calculateCustomFields(res.custom_fields);
+    const tags = res.tags.map((tag) => tag.name).join();
 
     const taskToCreate = {
       id: res.id,
@@ -84,6 +85,7 @@ export default async function getTaskById(taskId) {
       satisfaction: customFields.satisfaction,
       sprint_points: res.points || null,
       project_name: customFields.project_name,
+      tags,
     };
 
     let existingTask = await apiServicePostgres.getTaskByPk(taskToCreate.id);
