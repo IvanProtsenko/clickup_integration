@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import fetchClickupObject from './fetchClickupObject.js';
 import { ApiServicePostgreSQL } from '../services/ApiService.js';
 import makeApolloClient from '../services/makeApolloClient.js';
+import getTaskTimer from './getTaskTime.js';
 
 dotenv.config();
 const clickupUrl = 'https://api.clickup.com/api/v2/';
@@ -64,7 +65,7 @@ function calculateCustomFields(customFields) {
   return { satisfaction, project_name, task_type };
 }
 
-export default async function getTaskById(taskId) {
+export default async function getTaskById(taskId, userIds) {
   const apolloClient = makeApolloClient(process.env.HASURA_URL);
   const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
   const url = `${clickupUrl}task/${taskId}?custom_task_ids=true&include_subtasks=true`;
@@ -89,7 +90,11 @@ export default async function getTaskById(taskId) {
     };
 
     let existingTask = await apiServicePostgres.getTaskByPk(taskToCreate.id);
-    if (!existingTask) await apiServicePostgres.createTasks(taskToCreate);
+
+    if (!existingTask) {
+      const createdTask = await apiServicePostgres.createTasks(taskToCreate);
+      await getTaskTimer(createdTask.returning[0].id, userIds);
+    }
 
     await createAsigneeTasks(res);
 

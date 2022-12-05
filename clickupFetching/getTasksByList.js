@@ -44,7 +44,7 @@ async function createMembers(listId) {
   }
 }
 
-export default async function getTasks(listId, sprintName, page) {
+export default async function getTasks(listId, sprintName, userIds, page) {
   const url = `${clickupUrl}list/${listId}/task?page=${page}&archived=false&subtasks=true&include_closed=true`;
   const params = { url, method: 'GET' };
 
@@ -60,14 +60,14 @@ export default async function getTasks(listId, sprintName, page) {
     const tasks = [];
     for (let i = 0; i < tasksIds.length; i++) {
       await new Promise((r) => setTimeout(r, 700));
-      let task = await getTaskById(tasksIds[i]);
+      let task = await getTaskById(tasksIds[i], userIds);
       tasks.push(task);
     }
 
     let additionalTasks = [];
     if (tasksIds.length >= 100) {
       console.log('more pages!');
-      additionalTasks = await getTasks(listId, sprintName, ++page);
+      additionalTasks = await getTasks(listId, sprintName, userIds, ++page);
     }
 
     return tasks.concat(additionalTasks);

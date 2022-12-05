@@ -57,6 +57,14 @@ export class ApiServicePostgreSQL {
     }
   `;
 
+  GET_TIMER_BY_PK = gql`
+    query GetTimerByPk($id: String!) {
+      Timers_by_pk(id: $id) {
+        id
+      }
+    }
+  `;
+
   CREATE_TASK = gql`
     mutation createTasks($objects: [Task_insert_input!]!) {
       insert_Task(objects: $objects) {
@@ -70,6 +78,14 @@ export class ApiServicePostgreSQL {
   CREATE_ASIGNEES = gql`
     mutation createAsignee($objects: [Asignee_insert_input!]!) {
       insert_Asignee(objects: $objects) {
+        affected_rows
+      }
+    }
+  `;
+
+  CREATE_TIMERS = gql`
+    mutation CreateTimers($objects: [Timers_insert_input!]!) {
+      insert_Timers(objects: $objects) {
         affected_rows
       }
     }
@@ -123,6 +139,14 @@ export class ApiServicePostgreSQL {
     }
   `;
 
+  DELETE_TIMERS = gql`
+    mutation DeleteAllTimers {
+      delete_Timers(where: { id: { _neq: "0" } }) {
+        affected_rows
+      }
+    }
+  `;
+
   constructor(client) {
     this.client = client;
   }
@@ -163,6 +187,20 @@ export class ApiServicePostgreSQL {
       return result.data.Task_by_pk;
     } catch (err) {
       console.log('ERROR getTaskByPk:', err);
+    }
+  };
+
+  getTimerByPk = async (id) => {
+    try {
+      const result = await this.client.query({
+        query: this.GET_TIMER_BY_PK,
+        variables: {
+          id,
+        },
+      });
+      return result.data.Timers_by_pk;
+    } catch (err) {
+      console.log('ERROR getTimerByPk:', err);
     }
   };
 
@@ -226,14 +264,28 @@ export class ApiServicePostgreSQL {
 
   createTasks = async (objects) => {
     try {
-      await this.client.mutate({
+      const result = await this.client.mutate({
         mutation: this.CREATE_TASK,
         variables: {
           objects,
         },
       });
+      return result.data.insert_Task;
     } catch (err) {
       console.log('ERROR createTasks:', err);
+    }
+  };
+
+  createTimers = async (objects) => {
+    try {
+      await this.client.mutate({
+        mutation: this.CREATE_TIMERS,
+        variables: {
+          objects,
+        },
+      });
+    } catch (err) {
+      console.log('ERROR createTimers:', err);
     }
   };
 
@@ -287,6 +339,16 @@ export class ApiServicePostgreSQL {
       });
     } catch (err) {
       console.log('ERROR deleteSprints:', err);
+    }
+  };
+
+  deleteTimers = async () => {
+    try {
+      await this.client.mutate({
+        mutation: this.DELETE_TIMERS,
+      });
+    } catch (err) {
+      console.log('ERROR deleteTimers:', err);
     }
   };
 }

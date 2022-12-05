@@ -3,7 +3,7 @@ import fetchClickupObject from './fetchClickupObject.js';
 
 const clickupUrl = 'https://api.clickup.com/api/v2/';
 
-export default async function getFolders(spaceId) {
+export default async function getFolders(spaceId, userIds) {
   const url = `${clickupUrl}space/${spaceId}/folder?archived=false`;
   const params = { url, method: 'GET' };
   try {
@@ -14,7 +14,12 @@ export default async function getFolders(spaceId) {
     const sprintNames = await folder.lists.map((sprint) => sprint.name);
     const sprints = [];
     for (let i = 0; i < sprintIds.length; i++) {
-      let sprintTasks = await getTasks(sprintIds[i], sprintNames[i], 0);
+      let sprintTasks = await getTasks(
+        sprintIds[i],
+        sprintNames[i],
+        userIds,
+        0
+      );
       sprints.push(sprintTasks);
     }
     return sprints;
