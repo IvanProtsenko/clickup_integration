@@ -58,9 +58,11 @@ export default async function getTasks(listId, sprintName, userIds, page) {
     console.log(sprintName + ': ' + res.tasks.length);
     const tasksIds = await res.tasks.map((task) => task.id);
     const tasks = [];
+    let existingTimers = []
     for (let i = 0; i < tasksIds.length; i++) {
       await new Promise((r) => setTimeout(r, 700));
-      let task = await getTaskById(tasksIds[i], userIds);
+      let task = await getTaskById(tasksIds[i], userIds, existingTimers);
+      existingTimers = existingTimers.concat(task.timers)
       tasks.push(task);
     }
 

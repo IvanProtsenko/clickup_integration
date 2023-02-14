@@ -8,6 +8,18 @@ import getTaskTimer from './getTaskTime.js';
 dotenv.config();
 const clickupUrl = 'https://api.clickup.com/api/v2/';
 
+function removeDublicateTimers(timers, existingTimers) {
+  for(let i = 0; i < timers.length; i++) {
+    for(let j = 0; j < existingTimers.length; j++) {
+      if(existingTimers[j].start == timers[i].start && existingTimers[j].end == timers[i].end) {
+        timers.splice(i, 1)
+        return removeDublicateTimers(timers, existingTimers)
+      }
+    }
+  }
+  return timers
+}
+
 async function createAsigneeTasks(res) {
   const apolloClient = makeApolloClient(process.env.HASURA_URL);
   const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
@@ -65,7 +77,7 @@ function calculateCustomFields(customFields) {
   return { satisfaction, project_name, task_type };
 }
 
-export default async function getTaskById(taskId, userIds) {
+export default async function getTaskById(taskId, userIds, existingTimers) {
   const apolloClient = makeApolloClient(process.env.HASURA_URL);
   const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
   const url = `${clickupUrl}task/${taskId}?custom_task_ids=true&include_subtasks=true`;
@@ -94,11 +106,16 @@ export default async function getTaskById(taskId, userIds) {
     if (!existingTask) {
       const createdTask = await apiServicePostgres.createTasks(taskToCreate);
       await getTaskTimer(createdTask.returning[0].id, userIds);
+      const timers = await getTaskTimer(createdTask.returning[0].id, userIds);
+      const newTimers = removeDublicateTimers(timers, existingTimers)
+      taskToCreate.timers = newTimers
+      
+      await apiServicePostgres.createTimers(newTimers);
     }
 
     await createAsigneeTasks(res);
 
-    return res;
+    return taskToCreate;
   } catch (err) {
     console.log('err while fetching task: ', err);
   }

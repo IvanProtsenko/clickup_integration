@@ -20,12 +20,14 @@ export default async function getTaskTimer(taskId, userIds) {
         id: res.data[i].id,
         asigneeName: res.data[i].user.username,
         taskId,
-        duration: res.data[i].duration,
+        duration: Math.floor(res.data[i].duration / 60000),
+        start: res.data[i].start,
+        end: res.data[i].end,
       };
       let existingTimer = await apiServicePostgres.getTimerByPk(newTimer.id);
       if (!existingTimer) timers.push(newTimer);
     }
-    if (timers.length > 0) await apiServicePostgres.createTimers(timers);
+    return timers
   } catch (err) {
     console.log('err while fetching task: ', err);
   }

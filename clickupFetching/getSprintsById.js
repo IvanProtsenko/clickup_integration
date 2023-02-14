@@ -9,11 +9,11 @@ export default async function getFolders(spaceId, userIds) {
   try {
     const res = await fetchClickupObject(params);
     //   console.log(res);
-    const folder = res.folders[1];
+    const folder = res.folders[0];
     const sprintIds = await folder.lists.map((sprint) => sprint.id);
     const sprintNames = await folder.lists.map((sprint) => sprint.name);
     const sprints = [];
-    for (let i = 0; i < sprintIds.length; i++) {
+    for (let i = 37; i < sprintIds.length-1; i++) {
       let sprintTasks = await getTasks(
         sprintIds[i],
         sprintNames[i],
