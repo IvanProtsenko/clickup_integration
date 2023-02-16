@@ -8,6 +8,14 @@ dotenv.config();
 export class ApiServicePostgreSQL {
   client = null;
 
+  GET_LATEST_SPRINT = gql`
+    query GetLatestSprint {
+      Sprint(order_by: {created_at: desc}, limit: 1) {
+        name
+      }
+    }
+  `
+
   GET_ASIGNEES = gql`
     query GetAsignees {
       Asignee {
@@ -219,6 +227,17 @@ export class ApiServicePostgreSQL {
       console.log('ERROR getAsigneeTasks:', err);
     }
   };
+
+  getLatestSprint = async () => {
+    try {
+      const result = await this.client.query({
+        query: this.GET_LATEST_SPRINT,
+      });
+      return result.data.Sprint[0].name;
+    } catch (err) {
+      console.log('ERROR getLatestSprint:', err);
+    }
+  }
 
   getAsigneeByPk = async (name) => {
     try {

@@ -1,9 +1,13 @@
 import getTasks from './getTasksByList.js';
 import fetchClickupObject from './fetchClickupObject.js';
+import makeApolloClient from '../services/makeApolloClient.js';
+import { ApiServicePostgreSQL } from '../services/ApiService.js';
 
 const clickupUrl = 'https://api.clickup.com/api/v2/';
 
 export default async function getFolders(spaceId, userIds) {
+  const apolloClient = makeApolloClient(process.env.HASURA_URL);
+  const apiServicePostgres = new ApiServicePostgreSQL(apolloClient);
   const url = `${clickupUrl}space/${spaceId}/folder?archived=false`;
   const params = { url, method: 'GET' };
   try {
@@ -13,7 +17,9 @@ export default async function getFolders(spaceId, userIds) {
     const sprintIds = await folder.lists.map((sprint) => sprint.id);
     const sprintNames = await folder.lists.map((sprint) => sprint.name);
     const sprints = [];
-    for (let i = 37; i < sprintIds.length-1; i++) {
+    const latestSprint = await apiServicePostgres.getLatestSprint();
+    const latestSprintNumber = parseInt(latestSprint.split(' ')[1])
+    for (let i = latestSprintNumber; i < latestSprintNumber+1; i++) {
       let sprintTasks = await getTasks(
         sprintIds[i],
         sprintNames[i],
