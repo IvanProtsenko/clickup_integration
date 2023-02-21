@@ -59,16 +59,20 @@ function calculateCustomFields(customFields) {
       satisfaction = customFields[i].value || null;
     } else if (customFields[i].name == 'Task type') {
       const task = customFields[i];
-      for (let j = 0; j < task.type_config.options.length; j++) {
-        if (task.type_config.options[j].orderindex == task.value) {
-          task_type = task.type_config.options[j].name;
+      if(task.type_config.options) {
+        for (let j = 0; j < task.type_config.options.length; j++) {
+          if (task.type_config.options[j].orderindex == task.value) {
+            task_type = task.type_config.options[j].name;
+          }
         }
       }
     } else if (customFields[i].name == 'Project') {
       const project = customFields[i];
-      for (let j = 0; j < project.type_config.options.length; j++) {
-        if (project.type_config.options[j].orderindex == project.value) {
-          project_name = project.type_config.options[j].name;
+      if(project.type_config.options) {
+        for (let j = 0; j < project.type_config.options.length; j++) {
+          if (project.type_config.options[j].orderindex == project.value) {
+            project_name = project.type_config.options[j].name;
+          }
         }
       }
     }
