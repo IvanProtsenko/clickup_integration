@@ -66,7 +66,7 @@ function calculateCustomFields(customFields) {
           }
         }
       }
-    } else if (customFields[i].name == 'Project') {
+    } else if (customFields[i].name == 'Projects') {
       const project = customFields[i];
       if(project.type_config.options) {
         for (let j = 0; j < project.type_config.options.length; j++) {
